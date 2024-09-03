@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">CustomView</string>
+    <string name="title_text">Магазин продуктов</string>
+    <string name="user_name">Название продукта</string>
+    <string name="text_price">Цена продукта</string>
+    <string name="exit">Выход</string>
+    <string name="next">Создать магазин</string>
+    <string name="add">Добавить</string>
+</resources>
