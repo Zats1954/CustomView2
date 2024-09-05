@@ -25,11 +25,11 @@ class TradeActivity : AppCompatActivity() {
     private lateinit var listAdapter: ListAdapter
     private var bitmap: Bitmap? = null
     private lateinit var emptyBitmap: Bitmap
-    private lateinit var userModel: UserViewModel
+    private lateinit var productModel: ProductViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        userModel = ViewModelProvider(this)[UserViewModel::class.java]
+        productModel = ViewModelProvider(this)[ProductViewModel::class.java]
         binding = ActivityTradeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         toolBar = binding.toolbarMain
@@ -37,9 +37,9 @@ class TradeActivity : AppCompatActivity() {
         title = " "
 
         emptyBitmap = getDrawable(R.drawable.ic_unknown_foreground)!!.toBitmap()
-        listAdapter = ListAdapter(applicationContext, userModel.listUsers.value!!)
+        listAdapter = ListAdapter(applicationContext, productModel.listUsers.value!!)
 
-        userModel.listUsers.observe(this) {
+        productModel.listUsers.observe(this) {
             listAdapter = ListAdapter(this, it)
         }
         val inputKeyboard = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
@@ -54,12 +54,8 @@ class TradeActivity : AppCompatActivity() {
 
         binding.save.setOnClickListener {
             try {
-                val user = Product(
-                    binding.edName.text.toString(),
-                    binding.edPrice.text.toString().toDouble(),
-                    bitmap ?: emptyBitmap
-                )
-                userModel.add(user)
+                val product = product()
+                productModel.add(product)
                 listAdapter.notifyDataSetChanged()
                 println("////////-----------listAdapter.count ${listAdapter.count}")
                 println("--------------------binding.listView.size ${binding.listView.size}")
@@ -71,6 +67,15 @@ class TradeActivity : AppCompatActivity() {
                 Toast.makeText(this, "Неправильный ввод", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun product(): Product {
+        val product = Product(
+            binding.edName.text.toString(),
+            binding.edPrice.text.toString().toDouble(),
+            bitmap ?: emptyBitmap
+        )
+        return product
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

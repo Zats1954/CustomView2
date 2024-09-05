@@ -3,7 +3,7 @@ package ru.zatsoft.customview
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class UserViewModel : ViewModel() {
+class ProductViewModel : ViewModel() {
 
     private val _listUsers = MutableLiveData<MutableList<Product>>()
     val listUsers: MutableLiveData<MutableList<Product>>
