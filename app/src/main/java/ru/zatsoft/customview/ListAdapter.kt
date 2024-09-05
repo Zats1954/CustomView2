@@ -24,8 +24,8 @@ class ListAdapter(private val context: Context, private val dataList: MutableLis
         return position.toLong()
     }
 
-    override fun getView(position: Int, view: View?, parent: ViewGroup): View{
-        var view = view ?: LayoutInflater.from(context).inflate(R.layout.list_item,parent,false)
+    override fun getView(position: Int, v: View?, parent: ViewGroup): View{
+        val view = v?: LayoutInflater.from(context).inflate(R.layout.list_item,parent,false)
         val data = getItem(position)
         val tvName = view.findViewById<TextView>(R.id.tvName)
         val tvAge = view.findViewById<TextView>(R.id.tvPrice)
@@ -33,10 +33,6 @@ class ListAdapter(private val context: Context, private val dataList: MutableLis
         tvName.text = data.name
         tvAge.text = data.price.toString()
         ivImageView.setImageBitmap(data.image)
-// -------------------------  update -----------
-        view.invalidate()
-        this.notifyDataSetChanged()
-// -----------------------------------
         return view
     }
 }

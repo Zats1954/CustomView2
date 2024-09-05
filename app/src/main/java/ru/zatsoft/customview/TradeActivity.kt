@@ -8,12 +8,11 @@ import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
-import android.widget.AbsListView
-import android.widget.AbsListView.OnScrollListener.SCROLL_STATE_IDLE
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.size
 import androidx.lifecycle.ViewModelProvider
 import ru.zatsoft.customview.databinding.ActivityTradeBinding
 import java.io.IOException
@@ -26,10 +25,11 @@ class TradeActivity : AppCompatActivity() {
     private lateinit var listAdapter: ListAdapter
     private var bitmap: Bitmap? = null
     private lateinit var emptyBitmap: Bitmap
+    private lateinit var userModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val userModel = ViewModelProvider(this)[UserViewModel::class.java]
+        userModel = ViewModelProvider(this)[UserViewModel::class.java]
         binding = ActivityTradeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         toolBar = binding.toolbarMain
@@ -37,14 +37,10 @@ class TradeActivity : AppCompatActivity() {
         title = " "
 
         emptyBitmap = getDrawable(R.drawable.ic_unknown_foreground)!!.toBitmap()
-        listAdapter = ListAdapter(this, userModel.listUsers.value!!)
+        listAdapter = ListAdapter(applicationContext, userModel.listUsers.value!!)
 
         userModel.listUsers.observe(this) {
             listAdapter = ListAdapter(this, it)
-// -------------------------  update -----------
-            listAdapter.notifyDataSetChanged()
-            binding.root.invalidate()
-// -----------------------------------------
         }
         val inputKeyboard = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         binding.listView.adapter = listAdapter
@@ -57,22 +53,23 @@ class TradeActivity : AppCompatActivity() {
         }
 
         binding.save.setOnClickListener {
-            try{
-            val user = Product(binding.edName.text.toString(),
-                binding.edPrice.text.toString().toDouble(),
-                bitmap?: emptyBitmap )
-            userModel.add(user)
-            binding.edName.text.clear()
-            binding.edPrice.text.clear()
-            binding.ivProductView.setImageResource(R.drawable.ic_unknown_foreground)
-// -------------------------  update -----------
-            listAdapter.notifyDataSetChanged()
-            binding.root.invalidate()
-// --------------------------------------------------------
-            inputKeyboard.hideSoftInputFromWindow(this.currentFocus?.windowToken, 0)
-        }catch(e:NumberFormatException){
-            Toast.makeText(this, "Неправильный ввод", Toast.LENGTH_LONG).show()
-        }
+            try {
+                val user = Product(
+                    binding.edName.text.toString(),
+                    binding.edPrice.text.toString().toDouble(),
+                    bitmap ?: emptyBitmap
+                )
+                userModel.add(user)
+                listAdapter.notifyDataSetChanged()
+                println("////////-----------listAdapter.count ${listAdapter.count}")
+                println("--------------------binding.listView.size ${binding.listView.size}")
+                binding.edName.text.clear()
+                binding.edPrice.text.clear()
+                binding.ivProductView.setImageResource(R.drawable.ic_unknown_foreground)
+                inputKeyboard.hideSoftInputFromWindow(this.currentFocus?.windowToken, 0)
+            } catch (e: NumberFormatException) {
+                Toast.makeText(this, "Неправильный ввод", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -87,17 +84,23 @@ class TradeActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            REQUEST_GALLERY -> if(resultCode === RESULT_OK){
-                val selectedPhoto : Uri? = data?.data
-                try{
-                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhoto )
-                } catch(e:IOException){
+        when (requestCode) {
+            REQUEST_GALLERY -> if (resultCode === RESULT_OK && data != null && data.data != null) {
+                val selectedPhoto: Uri? = data.data
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhoto)
+                } catch (e: IOException) {
                     e.printStackTrace()
                 }
                 binding.ivProductView.setImageBitmap(bitmap)
-            }            }
+            } else {
+                Toast.makeText(applicationContext, "Ошибка загрузки изображения result.data", Toast.LENGTH_LONG)
+                    .show()
+            }
+            else -> Toast.makeText(applicationContext, "Ошибка загрузки изображени requestCode = $requestCode", Toast.LENGTH_LONG)
+                .show()
+        }
     }
 }
