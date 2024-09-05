@@ -39,8 +39,9 @@ class TradeActivity : AppCompatActivity() {
         emptyBitmap = getDrawable(R.drawable.ic_unknown_foreground)!!.toBitmap()
         listAdapter = ListAdapter(applicationContext, productModel.listUsers.value!!)
 
-        productModel.listUsers.observe(this) {
-            listAdapter = ListAdapter(this, it)
+        productModel.listUsers.observe(this){
+            listAdapter = ListAdapter(applicationContext, productModel.listUsers.value!!)
+//            listAdapter = ListAdapter(this, it)
         }
         val inputKeyboard = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         binding.listView.adapter = listAdapter
@@ -56,7 +57,8 @@ class TradeActivity : AppCompatActivity() {
             try {
                 val product = product()
                 productModel.add(product)
-                listAdapter.notifyDataSetChanged()
+                listAdapter = ListAdapter(applicationContext, productModel.listUsers.value!!)
+//                listAdapter.notifyDataSetChanged()
                 println("////////-----------listAdapter.count ${listAdapter.count}")
                 println("--------------------binding.listView.size ${binding.listView.size}")
                 binding.edName.text.clear()
