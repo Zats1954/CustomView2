@@ -12,7 +12,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.size
 import androidx.lifecycle.ViewModelProvider
 import ru.zatsoft.customview.databinding.ActivityTradeBinding
 import java.io.IOException
@@ -23,7 +22,7 @@ class TradeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTradeBinding
     private lateinit var toolBar: Toolbar
     private lateinit var listAdapter: ListAdapter
-    private var bitmap: Bitmap? = null
+
     private lateinit var emptyBitmap: Bitmap
     private lateinit var productModel: ProductViewModel
 
@@ -38,11 +37,6 @@ class TradeActivity : AppCompatActivity() {
 
         emptyBitmap = getDrawable(R.drawable.ic_unknown_foreground)!!.toBitmap()
         listAdapter = ListAdapter(applicationContext, productModel.listUsers.value!!)
-
-        productModel.listUsers.observe(this){
-            listAdapter = ListAdapter(applicationContext, productModel.listUsers.value!!)
-//            listAdapter = ListAdapter(this, it)
-        }
         val inputKeyboard = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         binding.listView.adapter = listAdapter
         binding.listView.setClickable(true)
@@ -57,13 +51,11 @@ class TradeActivity : AppCompatActivity() {
             try {
                 val product = product()
                 productModel.add(product)
-                listAdapter = ListAdapter(applicationContext, productModel.listUsers.value!!)
-//                listAdapter.notifyDataSetChanged()
-                println("////////-----------listAdapter.count ${listAdapter.count}")
-                println("--------------------binding.listView.size ${binding.listView.size}")
+                listAdapter.notifyDataSetChanged()
                 binding.edName.text.clear()
                 binding.edPrice.text.clear()
                 binding.ivProductView.setImageResource(R.drawable.ic_unknown_foreground)
+                productModel.setBitmap(null)
                 inputKeyboard.hideSoftInputFromWindow(this.currentFocus?.windowToken, 0)
             } catch (e: NumberFormatException) {
                 Toast.makeText(this, "Неправильный ввод", Toast.LENGTH_LONG).show()
@@ -75,7 +67,7 @@ class TradeActivity : AppCompatActivity() {
         val product = Product(
             binding.edName.text.toString(),
             binding.edPrice.text.toString().toDouble(),
-            bitmap ?: emptyBitmap
+            productModel.getBitmap() ?: emptyBitmap
         )
         return product
     }
@@ -97,11 +89,11 @@ class TradeActivity : AppCompatActivity() {
             REQUEST_GALLERY -> if (resultCode === RESULT_OK && data != null && data.data != null) {
                 val selectedPhoto: Uri? = data.data
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedPhoto)
+                    productModel.setBitmap(MediaStore.Images.Media.getBitmap(contentResolver, selectedPhoto))
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                binding.ivProductView.setImageBitmap(bitmap)
+                binding.ivProductView.setImageBitmap(productModel.getBitmap())
             } else {
                 Toast.makeText(applicationContext, "Ошибка загрузки изображения result.data", Toast.LENGTH_LONG)
                     .show()

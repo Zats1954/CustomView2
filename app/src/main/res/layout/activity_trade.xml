@@ -39,8 +39,8 @@
 
         <ImageView
             android:id="@+id/ivProductView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/image_dimension"
+            android:layout_height="@dimen/image_dimension"
             android:layout_weight="2"
             android:src="@drawable/ic_unknown_foreground"/>
 
