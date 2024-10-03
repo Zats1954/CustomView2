@@ -4,14 +4,13 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModelProvider
 import ru.zatsoft.customview.databinding.ActivityTradeBinding
 import java.io.IOException
@@ -22,8 +21,6 @@ class TradeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTradeBinding
     private lateinit var toolBar: Toolbar
     private lateinit var listAdapter: ListAdapter
-
-    private lateinit var emptyBitmap: Bitmap
     private lateinit var productModel: ProductViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,11 +32,18 @@ class TradeActivity : AppCompatActivity() {
         setSupportActionBar(toolBar)
         title = " "
 
-        emptyBitmap = getDrawable(R.drawable.ic_unknown_foreground)!!.toBitmap()
-        listAdapter = ListAdapter(applicationContext, productModel.listUsers.value!!)
+        listAdapter = ListAdapter(applicationContext, productModel.listProducts.value!!)
         val inputKeyboard = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         binding.listView.adapter = listAdapter
         binding.listView.setClickable(true)
+        binding.listView.onItemClickListener = AdapterView.OnItemClickListener {
+                parent, v, position, id ->
+                        val product  = listAdapter.getItem(position)
+                        val productIntent = Intent(this,InfoActivity::class.java)
+                        productIntent.putExtra( "product",product)
+                        startActivity(productIntent)
+        }
+
 
         binding.ivProductView.setOnClickListener {
             val photoIntent = Intent(Intent.ACTION_PICK)
@@ -55,7 +59,7 @@ class TradeActivity : AppCompatActivity() {
                 binding.edName.text.clear()
                 binding.edPrice.text.clear()
                 binding.ivProductView.setImageResource(R.drawable.ic_unknown_foreground)
-                productModel.setBitmap(null)
+                productModel.setUri(null)
                 inputKeyboard.hideSoftInputFromWindow(this.currentFocus?.windowToken, 0)
             } catch (e: NumberFormatException) {
                 Toast.makeText(this, "Неправильный ввод", Toast.LENGTH_LONG).show()
@@ -67,7 +71,8 @@ class TradeActivity : AppCompatActivity() {
         val product = Product(
             binding.edName.text.toString(),
             binding.edPrice.text.toString().toDouble(),
-            productModel.getBitmap() ?: emptyBitmap
+            productModel.getUri().toString(),
+            binding.edDescription?.text.toString()
         )
         return product
     }
@@ -86,14 +91,15 @@ class TradeActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
+//       Загрузка изображения
             REQUEST_GALLERY -> if (resultCode === RESULT_OK && data != null && data.data != null) {
                 val selectedPhoto: Uri? = data.data
                 try {
-                    productModel.setBitmap(MediaStore.Images.Media.getBitmap(contentResolver, selectedPhoto))
+                    productModel.setUri(selectedPhoto)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                binding.ivProductView.setImageBitmap(productModel.getBitmap())
+                binding.ivProductView.setImageURI(productModel.getUri())
             } else {
                 Toast.makeText(applicationContext, "Ошибка загрузки изображения result.data", Toast.LENGTH_LONG)
                     .show()
@@ -101,5 +107,7 @@ class TradeActivity : AppCompatActivity() {
             else -> Toast.makeText(applicationContext, "Ошибка загрузки изображени requestCode = $requestCode", Toast.LENGTH_LONG)
                 .show()
         }
+
+
     }
 }

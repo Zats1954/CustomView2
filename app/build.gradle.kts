@@ -11,7 +11,6 @@ android {
         viewBinding = true
     }
 
-
     defaultConfig {
         applicationId = "ru.zatsoft.customview"
         minSdk = 24
@@ -38,6 +37,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
 }
 
 dependencies {

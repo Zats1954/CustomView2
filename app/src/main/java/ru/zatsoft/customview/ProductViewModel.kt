@@ -1,31 +1,32 @@
 package ru.zatsoft.customview
 
-import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class ProductViewModel : ViewModel() {
 
-    private var bitmap: Bitmap? = null
 
-    fun setBitmap(imageMap: Bitmap?){
-        this.bitmap = imageMap
+    private var photoUri: Uri? = null
+
+    fun setUri(imagePhoto: Uri?){
+        this.photoUri = imagePhoto
     }
 
-    fun getBitmap(): Bitmap?{
-        return bitmap
+    fun getUri(): Uri?{
+        return photoUri
     }
 
 
-    private val _listUsers = MutableLiveData<MutableList<Product>>()
-    val listUsers: MutableLiveData<MutableList<Product>>
-        get() = _listUsers
+    private val _listProducts = MutableLiveData<MutableList<Product>>()
+    val listProducts: MutableLiveData<MutableList<Product>>
+        get() = _listProducts
 
     init {
-        _listUsers.value = mutableListOf()
+        _listProducts.value = mutableListOf()
     }
 
-    fun add(user: Product) {
-        _listUsers.value?.add(user)
+    fun add(product: Product) {
+        _listProducts.value?.add(product)
     }
 }

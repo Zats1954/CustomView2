@@ -57,7 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin"
-                android:hint="@string/user_name" />
+                android:hint="@string/product_name" />
 
             <EditText
                 android:id="@+id/edPrice"

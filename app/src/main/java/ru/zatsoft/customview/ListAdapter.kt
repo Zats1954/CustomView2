@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 
 class ListAdapter(private val context: Context, private val dataList: MutableList<Product> )
     : ArrayAdapter<Product>(context, R.layout.list_item, dataList)
@@ -32,7 +33,7 @@ class ListAdapter(private val context: Context, private val dataList: MutableLis
         val ivImageView = view.findViewById<ImageView>(R.id.ivImage)
         tvName.text = data.name
         tvAge.text = data.price.toString()
-        ivImageView.setImageBitmap(data.image)
+        ivImageView.setImageURI(data.image.toUri())
         return view
     }
 }
