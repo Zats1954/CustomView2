@@ -1,13 +1,21 @@
 package ru.zatsoft.customview
 
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class ProductViewModel : ViewModel() {
 
-
     private var photoUri: Uri? = null
+
+     val _listProducts = MutableLiveData<MutableList<Product>>()
+    val listProducts: LiveData<MutableList<Product>> = _listProducts
+
+//    fun getListProduct():List{}
+    init {
+        _listProducts.value = mutableListOf()
+    }
 
     fun setUri(imagePhoto: Uri?){
         this.photoUri = imagePhoto
@@ -15,15 +23,6 @@ class ProductViewModel : ViewModel() {
 
     fun getUri(): Uri?{
         return photoUri
-    }
-
-
-    private val _listProducts = MutableLiveData<MutableList<Product>>()
-    val listProducts: MutableLiveData<MutableList<Product>>
-        get() = _listProducts
-
-    init {
-        _listProducts.value = mutableListOf()
     }
 
     fun add(product: Product) {

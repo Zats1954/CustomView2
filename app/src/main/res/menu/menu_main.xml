@@ -8,4 +8,10 @@
         android:title="@string/exit"
         app:showAsAction="never" >
     </item>
+    <item
+        android:icon="@color/white"
+        android:id="@+id/back"
+        android:title="@string/back"
+        app:showAsAction="never" >
+    </item>
 </menu>
